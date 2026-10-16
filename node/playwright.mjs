@@ -6,7 +6,10 @@ import { GATEWAY, PASS, USER } from "./env.mjs";
 const browser = await chromium.launch({
   proxy: { server: `http://${GATEWAY}`, username: USER, password: PASS },
 });
-const page = await browser.newPage();
-await page.goto("https://api.ipify.org");
-console.log("browser exit IP:", (await page.textContent("body")).trim());
-await browser.close();
+try {
+  const page = await browser.newPage();
+  await page.goto("https://api.ipify.org");
+  console.log("browser exit IP:", (await page.textContent("body")).trim());
+} finally {
+  await browser.close();
+}

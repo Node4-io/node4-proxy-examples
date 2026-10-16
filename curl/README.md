@@ -13,4 +13,4 @@ Two habits worth keeping:
 - Use `socks5h://` (or `--socks5-hostname`) so DNS is resolved at the proxy and does not leak from your machine.
 - One curl command that fetches several URLs reuses one connection, and therefore one exit IP. Run one URL per command if you want a new IP each time.
 
-If a password contains `@`, `:` or `/`, percent-encode it in the URL, or pass it separately with `-U "$NODE4_USER:$NODE4_PASS"`.
+The script passes credentials with `-U "$NODE4_USER:$NODE4_PASS"` rather than inside the proxy URL, so a password containing `@`, `:` or `/` works without escaping.

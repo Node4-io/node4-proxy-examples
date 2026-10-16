@@ -1,7 +1,7 @@
 // A concurrent worker pool through a Node4 gateway.
 //
 //	export NODE4_USER=... NODE4_PASS=...
-//	go run . -workers 20 -n 40
+//	go run . -workers 10 -n 40
 //
 // -fresh (the default) disables keep-alive so every request opens its own connection,
 // and rotation is per connection, so each request can leave from a different exit.
@@ -20,8 +20,31 @@ import (
 	"time"
 )
 
+// fetch returns the response body and whether the request succeeded with a 200.
+// A 407 (bad credentials, or a product your plan does not include) or a 502 is a
+// failure, not an exit IP.
+func fetch(client *http.Client, target string) (string, bool) {
+	resp, err := client.Get(target)
+	if err != nil {
+		// For an https:// target a 407 arrives as an error from the CONNECT step.
+		if strings.Contains(err.Error(), "Proxy Authentication Required") {
+			fmt.Fprintln(os.Stderr, "407 from the proxy: check NODE4_USER/NODE4_PASS and that your plan includes this product")
+		}
+		return "", false
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusProxyAuthRequired {
+			fmt.Fprintln(os.Stderr, "407 from the proxy: check NODE4_USER/NODE4_PASS and that your plan includes this product")
+		}
+		return "", false
+	}
+	return strings.TrimSpace(string(body)), true
+}
+
 func main() {
-	workers := flag.Int("workers", 20, "concurrent connections (keep at or below your plan's limit)")
+	workers := flag.Int("workers", 10, "concurrent connections (keep at or below your plan's limit)")
 	n := flag.Int("n", 40, "requests to send")
 	fresh := flag.Bool("fresh", true, "new connection per request (new exit per request)")
 	target := flag.String("url", "https://api.ipify.org", "URL to fetch")
@@ -58,14 +81,12 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for range jobs {
-				resp, err := client.Get(*target)
+				ip, ok := fetch(client, *target)
 				mu.Lock()
-				if err != nil {
-					failed++
+				if ok {
+					exits[ip]++
 				} else {
-					body, _ := io.ReadAll(resp.Body)
-					resp.Body.Close()
-					exits[strings.TrimSpace(string(body))]++
+					failed++
 				}
 				mu.Unlock()
 			}

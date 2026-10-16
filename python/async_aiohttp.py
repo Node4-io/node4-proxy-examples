@@ -10,7 +10,7 @@ import aiohttp
 
 from _env import proxy_url
 
-CONCURRENCY = int(os.environ.get("CONCURRENCY", "20"))
+CONCURRENCY = int(os.environ.get("CONCURRENCY", "10"))
 URLS = ["https://api.ipify.org"] * 40
 
 

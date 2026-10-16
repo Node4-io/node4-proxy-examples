@@ -20,9 +20,17 @@ def fetch(url: str, attempts: int = 4) -> requests.Response:
         try:
             with requests.Session() as s:
                 r = s.get(url, proxies=proxies, timeout=30)
+            if r.status_code == 407:
+                raise RuntimeError("407 from the proxy: check NODE4_USER/NODE4_PASS and that your plan includes this product")
             if r.status_code not in RETRY_ON:
                 return r
             reason = f"HTTP {r.status_code}"
+        except requests.exceptions.ProxyError as e:
+            # A 407 from the proxy means wrong credentials or a product your plan does
+            # not include. Retrying cannot fix that, and repeated bad logins look like abuse.
+            if "407" in str(e):
+                raise
+            reason = type(e).__name__
         except requests.RequestException as e:
             reason = type(e).__name__
         if attempt == attempts:

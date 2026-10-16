@@ -4,8 +4,11 @@ import puppeteer from "puppeteer";
 import { GATEWAY, PASS, USER } from "./env.mjs";
 
 const browser = await puppeteer.launch({ args: [`--proxy-server=http://${GATEWAY}`] });
-const page = await browser.newPage();
-await page.authenticate({ username: USER, password: PASS });
-await page.goto("https://api.ipify.org");
-console.log("browser exit IP:", await page.evaluate(() => document.body.innerText.trim()));
-await browser.close();
+try {
+  const page = await browser.newPage();
+  await page.authenticate({ username: USER, password: PASS });
+  await page.goto("https://api.ipify.org");
+  console.log("browser exit IP:", await page.evaluate(() => document.body.innerText.trim()));
+} finally {
+  await browser.close();
+}

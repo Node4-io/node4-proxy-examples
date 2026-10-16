@@ -14,7 +14,7 @@ To use it in your own project, copy `node4demo/middlewares.py` and add to `setti
 DOWNLOADER_MIDDLEWARES = {"node4demo.middlewares.Node4ProxyMiddleware": 350}
 ```
 
-- Requests rotate freely by default.
+- Requests without a session send `Connection: close`, so each opens its own tunnel and can leave from a different exit (Scrapy otherwise pools tunnels and reuses a few exits). Set `NODE4_REUSE_CONNECTIONS = True` to keep pooling.
 - `meta={"node4_session": "abc123"}` holds one exit across those requests (up to 30 minutes on the rotating gateways), for logins and other multi-step flows.
 - Set `NODE4_GATEWAY` (environment or setting) to use Rotating Unmetered (`gw-rotating_unmetered.node4.io:8084`) or residential (`gw-residential.node4.io:8082`).
 - On Rotating Unmetered, keep `CONCURRENT_REQUESTS` at or below your plan's connection count.

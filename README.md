@@ -8,15 +8,21 @@ Node4 sells dedicated and shared datacenter proxies on IP blocks it owns in the 
 
 [Sign up](https://node4.io/sign-up), then copy your username and password from the **Proxies** page.
 
+On the **free tier** you get 3 static shared proxies over HTTP(S). Test one of them (the IP is on your Proxies page):
+
 ```sh
 export NODE4_USER='your-username'
 export NODE4_PASS='your-password'
-
-# Rotating Datacenter gateway: each new connection can leave from a different IP
-curl -x "http://$NODE4_USER:$NODE4_PASS@gw-rotating_datacenter.node4.io:8083" https://api.ipify.org
+curl -sS -U "$NODE4_USER:$NODE4_PASS" -x http://YOUR-PROXY-IP:4443 https://api.ipify.org
 ```
 
-The free tier gives you 3 static shared proxies over HTTP(S). Use one of those with `export NODE4_PROXY='IP:4443'` and the static examples below.
+With a **rotating plan**, use the gateway instead. Each new connection can leave from a different IP:
+
+```sh
+curl -sS -U "$NODE4_USER:$NODE4_PASS" -x http://gw-rotating_datacenter.node4.io:8083 https://api.ipify.org
+```
+
+On Windows PowerShell, set the variables with `$env:NODE4_USER = 'your-username'` and `$env:NODE4_PASS = 'your-password'`.
 
 ## Endpoints
 
@@ -72,6 +78,8 @@ More detail: [IP rotation guide](https://node4.io/help/ip-rotation-guide).
 | `NODE4_USER`, `NODE4_PASS` | everything | from your Proxies page |
 | `NODE4_GATEWAY` | rotating and residential examples | `gw-rotating_datacenter.node4.io:8083` (default) |
 | `NODE4_PROXY` | static examples | `203.0.113.10:4443` |
+
+Concurrency defaults in the examples stay at or below 10 connections, the free tier's limit. On Rotating Unmetered, raise them to your plan's connection count.
 
 Copy `.env.example` to `.env` if you prefer a file. Never commit real credentials.
 

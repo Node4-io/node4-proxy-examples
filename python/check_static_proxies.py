@@ -27,12 +27,14 @@ def check(endpoint: str) -> tuple[str, str, float]:
 def main() -> None:
     if len(sys.argv) > 1:
         with open(sys.argv[1]) as f:
-            endpoints = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+            # Accepts IP:PORT or IP:PORT:USER:PASS lines (the API's txt export); only
+            # IP:PORT is used, the credentials come from NODE4_USER / NODE4_PASS.
+            endpoints = [":".join(line.strip().split(":")[:2]) for line in f if line.strip() and not line.startswith("#")]
     elif STATIC:
         endpoints = [STATIC]
     else:
         sys.exit("Pass a file of IP:PORT lines, or set NODE4_PROXY.")
-    with ThreadPoolExecutor(max_workers=20) as pool:
+    with ThreadPoolExecutor(max_workers=10) as pool:
         results = list(pool.map(check, endpoints))
     for endpoint, status, secs in results:
         print(f"{endpoint:<24} {status:<28} {secs:5.2f}s")

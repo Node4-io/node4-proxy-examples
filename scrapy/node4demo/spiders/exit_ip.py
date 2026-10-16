@@ -17,7 +17,7 @@ class ExitIpSpider(scrapy.Spider):
             yield request
 
     def start_requests(self):
-        for i in range(5):
+        for i in range(20):
             yield scrapy.Request(f"https://api.ipify.org?format=json&n={i}", cb_kwargs={"kind": "rotating"}, dont_filter=True)
         session = secrets.token_hex(4)
         for i in range(3):

@@ -3,6 +3,13 @@
 node_modules/
 __pycache__/
 *.pyc
-go/node4-pool
-go/node4-pool.exe
+go/go
+go/go.exe
+venv/
+.scrapy/
+scrapy/exits.json
+*.json.tmp
+.DS_Store
+.idea/
+.vscode/
 node/package-lock.json

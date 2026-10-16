@@ -1,5 +1,6 @@
 // axios through the proxy. Set proxy: false and hand axios an agent: axios's own `proxy`
-// option sends HTTPS requests to the proxy without a CONNECT tunnel, which proxies refuse.
+// option does not open a CONNECT tunnel for https:// targets, so TLS is not end to end
+// and many proxies reject the request. An agent tunnels properly.
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import { proxyUrl } from "./env.mjs";
