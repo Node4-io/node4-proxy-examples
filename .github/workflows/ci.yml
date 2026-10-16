@@ -1,0 +1,33 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python compiles
+        run: python -m py_compile python/*.py scrapy/node4demo/*.py scrapy/node4demo/spiders/*.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Node syntax
+        run: for f in node/*.mjs; do node --check "$f"; done
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Go vet
+        working-directory: go
+        run: go vet ./...
+
+      - name: curl script syntax
+        run: bash -n curl/examples.sh

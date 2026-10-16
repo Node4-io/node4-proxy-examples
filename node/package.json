@@ -1,0 +1,26 @@
+{
+  "name": "node4-proxy-examples",
+  "private": true,
+  "type": "module",
+  "description": "Node.js examples for Node4 proxies",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "fetch": "node fetch-undici.mjs",
+    "axios": "node axios.mjs",
+    "socks5": "node socks5.mjs",
+    "rotate": "node rotate-per-request.mjs",
+    "playwright": "node playwright.mjs",
+    "puppeteer": "node puppeteer.mjs"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "https-proxy-agent": "^7.0.0",
+    "socks-proxy-agent": "^8.0.0",
+    "undici": "^6.19.0"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.45.0",
+    "puppeteer": "^23.0.0"
+  }
+}
