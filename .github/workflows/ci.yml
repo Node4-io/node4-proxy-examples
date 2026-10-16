@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Python compiles
-        run: python -m py_compile python/*.py scrapy/node4demo/*.py scrapy/node4demo/spiders/*.py
+        run: python -m py_compile python/*.py api/*.py scrapy/node4demo/*.py scrapy/node4demo/spiders/*.py
 
       - uses: actions/setup-node@v4
         with:

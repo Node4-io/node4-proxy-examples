@@ -69,6 +69,7 @@ More detail: [IP rotation guide](https://node4.io/help/ip-rotation-guide).
 | [`node/`](node/) | fetch/undici, axios, SOCKS5, Puppeteer, Playwright |
 | [`go/`](go/) | net/http with a proxy and a concurrent worker pool |
 | [`scrapy/`](scrapy/) | a minimal spider and settings that route every request through Node4 |
+| [`api/`](api/) | the REST API: account status, proxy list export, usage, IP whitelist management |
 | [`patterns/`](patterns/) | sizing concurrency, sticky vs rotating, retry and backoff |
 
 ## Environment variables
