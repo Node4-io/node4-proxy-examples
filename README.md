@@ -1,6 +1,8 @@
 # Node4 proxy examples
 
-Working code for using [Node4](https://node4.io) proxies from curl, Python, Node.js, Go and Scrapy: HTTP and SOCKS5, sticky sessions, rotation, retries and concurrency. Every example reads its credentials from environment variables and runs as-is.
+Working code for using [Node4](https://node4.io) proxies from curl, Python, Node.js, Go, Java, Kotlin, C#, PHP, PowerShell, Ruby, Rust, Scrapy and the major browser automation tools: HTTP and SOCKS5, sticky sessions, rotation, retries and concurrency. Every example reads its credentials from environment variables, and every one has been run against the live service.
+
+Also here: [`node4check`](checker/), a dependency-free proxy checker; a [local forwarder](browsers/local-forwarder/) for browsers and apps that cannot send a proxy password; and [proxy settings](tools/) for git, pip, npm, Docker, wget, proxychains and more.
 
 Node4 sells dedicated and shared datacenter proxies on IP blocks it owns in the United States, Italy and Spain, rotating datacenter gateways (billed per GB, or by concurrent connections with no data cap), and residential proxies in 170+ countries. There is a free tier with no card required. Prices are on [node4.io/pricing](https://node4.io/pricing).
 
@@ -55,7 +57,7 @@ Session IDs are up to 32 letters and digits that you choose. A new ID gives you 
 
 Rotation happens **per connection, not per request**. An HTTPS request travels inside a `CONNECT` tunnel, and every request sent down that tunnel leaves from the same IP. Modern HTTP clients keep connections alive by default, so a script that makes 100 requests through one client may use only a handful of exit IPs.
 
-- Want a new IP for each request? Open a new connection each time (see `python/rotate_per_request.py` and `node/rotate-per-request.mjs`).
+- Want a new IP for each request? Open a new connection each time. Every language folder has a rotation demo that counts distinct exits both ways: `python/rotate_per_request.py`, `node/rotate-per-request.mjs`, `go -fresh`, `java/RotatePerConnection.java`, `csharp` (`dotnet run -- rotate`), `php/rotate_per_request.php`, `powershell/rotate.ps1`, `ruby/rotate_per_request.rb`, `rust` (`--bin rotate`).
 - Want one IP for a short flow? Reuse one connection, or add a `-session-` ID to hold it across connections.
 
 More detail: [IP rotation guide](https://node4.io/help/ip-rotation-guide).
@@ -68,9 +70,20 @@ More detail: [IP rotation guide](https://node4.io/help/ip-rotation-guide).
 | [`python/`](python/) | requests, httpx, aiohttp, SOCKS5, sticky sessions, per-request rotation, retries, a static proxy checker |
 | [`node/`](node/) | fetch/undici, axios, SOCKS5, Puppeteer, Playwright |
 | [`go/`](go/) | net/http with a proxy and a concurrent worker pool |
+| [`java/`](java/) | HttpClient (and the two settings it needs), SOCKS5, sticky sessions, rotation, a bounded fetcher with retries, OkHttp |
+| [`kotlin/`](kotlin/) | coroutines and OkHttp with bounded concurrency, rotating and sticky |
+| [`csharp/`](csharp/) | HttpClient with WebProxy: rotating, static, sticky, per-request rotation, SOCKS5, capped concurrency with retries |
+| [`php/`](php/) | ext-curl (SOCKS5, sticky, fresh connection per request, curl_multi with a cap) and Guzzle |
+| [`powershell/`](powershell/) | Invoke-RestMethod on Windows PowerShell 5.1 and PowerShell 7, SOCKS5 on 7, a static proxy checker, the REST API |
+| [`ruby/`](ruby/) | Net::HTTP, Faraday, SOCKS5, sticky sessions, per-request rotation, a thread pool with retries |
+| [`rust/`](rust/) | reqwest and tokio: HTTP, socks5h, sticky sessions, per-request rotation, a capped concurrent fetcher |
 | [`scrapy/`](scrapy/) | a minimal spider and settings that route every request through Node4 |
+| [`browsers/`](browsers/) | Playwright (Python and Node), Puppeteer, Selenium with Chrome and Firefox, one exit IP per browser context, cutting data use on per-GB plans, and a local forwarder |
 | [`api/`](api/) | the REST API: account status, proxy list export, usage, IP whitelist management |
+| [`checker/`](checker/) | `node4check`: checks static proxies and gateways over HTTP and SOCKS5, with rotation and sticky tests and JSON/CSV output |
+| [`tools/`](tools/) | proxy settings for environment variables, curl, wget, git, pip, npm, Docker, apt, proxychains, yt-dlp, ssh and Windows |
 | [`patterns/`](patterns/) | sizing concurrency, sticky vs rotating, retry and backoff |
+| [`scripts/`](scripts/) | `smoke.sh`: runs the examples live and prints PASS/FAIL/SKIP |
 
 ## Environment variables
 
@@ -86,7 +99,17 @@ Copy `.env.example` to `.env` if you prefer a file. Never commit real credential
 
 ## Hostnames with underscores
 
-The gateway hostnames contain an underscore (`gw-rotating_datacenter`). curl, Python, Node.js, Go and browsers accept them. A few strict parsers do not (Java's `java.net.URI`, some SOCKS libraries). If yours rejects the name, resolve it first and connect to the IP with the same port.
+The gateway hostnames contain an underscore (`gw-rotating_datacenter`). curl, Python, Node.js, Go, .NET, PHP, PowerShell, Ruby, Rust and browsers accept them. Two exceptions we have hit: Java's `HttpClient` fails even when handed an `InetSocketAddress` (pass the resolved IP as a string; see [`java/`](java/)), and proxychains rejects the name for its first hop. If a tool rejects the name, resolve it first and connect to the IP with the same port.
+
+## When the login is wrong
+
+- Over **HTTP**, the proxy answers `407 Proxy Authentication Required`. Retrying will not help; check the username, password and that your plan includes that product.
+- Over **SOCKS5** there is no 407. The handshake accepts the login step and then refuses the connection (reply `0x02`, often shown as "connection not allowed by ruleset"). The SOCKS5 examples here recognize this and stop.
+- Chrome cannot take a password in `--proxy-server`. Use the browser tool's own proxy credentials (Playwright, Puppeteer) or the [local forwarder](browsers/local-forwarder/).
+
+## Ports the proxies will not carry
+
+The gateways refuse tunnels to port 22, so SSH to a normal server does not work through them. SSH to a server listening on 443 does; see [`tools/`](tools/).
 
 ## Help
 
@@ -94,6 +117,7 @@ The gateway hostnames contain an underscore (`gw-rotating_datacenter`). curl, Py
 - Which product fits your job: [choosing the right proxy type](https://node4.io/help/choosing-the-right-proxy-type)
 - Getting `407 Proxy Authentication Required`: [fixing 407](https://node4.io/help/fixing-407-proxy-authentication-required)
 - REST API for managing proxies: [API reference](https://node4.io/help/proxy-management-api)
+- Check a list of proxies or a gateway from the command line: [`checker/`](checker/)
 - Support: support@node4.io
 
 Issues and pull requests for new languages and libraries are welcome.

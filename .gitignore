@@ -13,3 +13,16 @@ scrapy/exits.json
 .idea/
 .vscode/
 node/package-lock.json
+rust/target/
+ruby/.bundle/
+ruby/vendor/
+java/okhttp/target/
+kotlin/build/
+kotlin/.gradle/
+kotlin/.kotlin/
+csharp/bin/
+csharp/obj/
+php/vendor/
+php/composer.lock
+browsers/node/node_modules/
+browsers/node/package-lock.json

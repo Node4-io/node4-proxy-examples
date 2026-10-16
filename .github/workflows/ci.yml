@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  check:
+  scripts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -14,14 +14,42 @@ jobs:
         with:
           python-version: "3.12"
       - name: Python compiles
-        run: python -m py_compile python/*.py api/*.py scrapy/node4demo/*.py scrapy/node4demo/spiders/*.py
+        run: python -m py_compile python/*.py api/*.py scrapy/node4demo/*.py scrapy/node4demo/spiders/*.py browsers/*.py browsers/local-forwarder/*.py checker/*.py
+      - name: Checker unit tests
+        working-directory: checker
+        run: python -m unittest -v test_node4check.py
+      - name: Forwarder unit tests
+        working-directory: browsers/local-forwarder
+        run: python -m unittest -v test_forwarder.py
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
       - name: Node syntax
-        run: for f in node/*.mjs; do node --check "$f"; done
+        run: for f in node/*.mjs browsers/node/*.mjs; do node --check "$f"; done
 
+      - name: Shell script syntax
+        run: bash -n curl/examples.sh && bash -n scripts/smoke.sh
+
+      - name: PHP syntax
+        run: for f in php/*.php; do php -l "$f"; done
+
+      - name: Ruby syntax
+        run: for f in ruby/*.rb; do ruby -c "$f"; done
+
+      - name: PowerShell parses
+        shell: pwsh
+        run: |
+          Get-ChildItem powershell/*.ps1 | ForEach-Object {
+            $errs = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errs) | Out-Null
+            if ($errs) { $errs; exit 1 }
+          }
+
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: "1.22"
@@ -30,5 +58,45 @@ jobs:
         working-directory: go
         run: go vet ./...
 
-      - name: curl script syntax
-        run: bash -n curl/examples.sh
+  jvm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Java compiles
+        run: mkdir -p /tmp/j && javac -d /tmp/j java/*.java
+      - name: OkHttp example compiles
+        working-directory: java/okhttp
+        run: mvn -q -B compile
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10"
+      - name: Kotlin compiles
+        working-directory: kotlin
+        run: gradle -q --no-daemon build
+
+  dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: C# builds
+        working-directory: csharp
+        run: dotnet build -nologo
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      - name: Rust builds
+        working-directory: rust
+        run: cargo build --locked --bins

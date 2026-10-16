@@ -1,0 +1,12 @@
+[package]
+name = "node4-examples"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Using Node4 proxies from Rust with reqwest and tokio"
+license = "MIT"
+
+[dependencies]
+# rustls instead of OpenSSL, so it builds the same everywhere; "socks" adds socks5h:// support.
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "socks"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }

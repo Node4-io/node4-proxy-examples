@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+
+# Only faraday_example.rb and socks5.rb need gems; the Net::HTTP examples use the standard library.
+gem "faraday", "~> 2.12"
+gem "faraday-net_http_persistent", "~> 2.3"
+gem "socksify", "~> 1.8"

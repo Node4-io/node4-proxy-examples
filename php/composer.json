@@ -1,0 +1,11 @@
+{
+    "name": "node4/proxy-examples-php",
+    "description": "Node4 proxy examples for PHP",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "guzzlehttp/guzzle": "^7.9"
+    }
+}

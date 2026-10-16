@@ -1,0 +1,37 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    connection_pool (3.0.2)
+    faraday (2.14.4)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.4)
+      net-http (~> 0.5)
+    faraday-net_http_persistent (2.3.1)
+      faraday (~> 2.5)
+      net-http-persistent (>= 4.0.4, < 5)
+    json (3.1.0)
+    logger (1.7.0)
+    net-http (0.10.0)
+      net-protocol (>= 0.3.0)
+      uri (>= 0.11.1)
+    net-http-persistent (4.0.8)
+      connection_pool (>= 2.2.4, < 4)
+    net-protocol (0.4.0)
+      timeout
+    socksify (1.8.1)
+    timeout (0.6.1)
+    uri (1.1.2)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  faraday (~> 2.12)
+  faraday-net_http_persistent (~> 2.3)
+  socksify (~> 1.8)
+
+BUNDLED WITH
+   2.5.22

@@ -1,0 +1,16 @@
+{
+  "name": "node4-browser-examples",
+  "private": true,
+  "type": "module",
+  "description": "Browser automation through Node4 proxies: Playwright and Puppeteer",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "playwright": "node playwright-contexts.mjs",
+    "puppeteer": "node puppeteer-contexts.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0",
+    "puppeteer": "^24.15.0"
+  }
+}
