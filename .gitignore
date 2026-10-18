@@ -26,3 +26,6 @@ php/vendor/
 php/composer.lock
 browsers/node/node_modules/
 browsers/node/package-lock.json
+node4_events.db
+proxy-health-state.json
+node4-events.json
