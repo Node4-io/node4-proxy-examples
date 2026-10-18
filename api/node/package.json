@@ -1,0 +1,12 @@
+{
+  "name": "node4-api-examples",
+  "private": true,
+  "type": "module",
+  "description": "Node.js examples for the Node4 REST API and webhooks",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node --test node4client.test.mjs webhook-receiver.test.mjs",
+    "webhooks": "node webhook-receiver.mjs"
+  }
+}

@@ -21,12 +21,18 @@ jobs:
       - name: Forwarder unit tests
         working-directory: browsers/local-forwarder
         run: python -m unittest -v test_forwarder.py
+      - name: API example unit tests (webhook signatures, retries)
+        working-directory: api
+        run: python -m unittest -v test_api_examples.py
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
       - name: Node syntax
-        run: for f in node/*.mjs browsers/node/*.mjs; do node --check "$f"; done
+        run: for f in node/*.mjs browsers/node/*.mjs api/node/*.mjs; do node --check "$f"; done
+      - name: Node API example tests (webhook signatures, retries)
+        working-directory: api/node
+        run: node --test node4client.test.mjs webhook-receiver.test.mjs
 
       - name: Shell script syntax
         run: bash -n curl/examples.sh && bash -n scripts/smoke.sh
