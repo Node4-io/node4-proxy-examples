@@ -1,6 +1,6 @@
 # Node4 proxy examples
 
-Working code for using [Node4](https://node4.io) proxies from curl, Python, Node.js, Go, Java, Kotlin, C#, PHP, PowerShell, Ruby, Rust, Scrapy and the major browser automation tools: HTTP and SOCKS5, sticky sessions, rotation, retries and concurrency. Every example reads its credentials from environment variables, and every one has been run against the live service.
+Working code for using [Node4](https://node4.io) proxies from curl, Python, Node.js, Go, Java, Kotlin, C#, PHP, PowerShell, Ruby, Rust, Scrapy and the major browser automation tools: HTTP and SOCKS5, sticky sessions, rotation, retries and concurrency. Every example reads its credentials from environment variables, and every proxy example has been run against the live service. The [REST API examples](api/) run offline tests in CI for webhook signatures and retry rules.
 
 Also here: [`node4check`](checker/), a dependency-free proxy checker; a [local forwarder](browsers/local-forwarder/) for browsers and apps that cannot send a proxy password; and [proxy settings](tools/) for git, pip, npm, Docker, wget, proxychains and more.
 
@@ -79,7 +79,7 @@ More detail: [IP rotation guide](https://node4.io/help/ip-rotation-guide).
 | [`rust/`](rust/) | reqwest and tokio: HTTP, socks5h, sticky sessions, per-request rotation, a capped concurrent fetcher |
 | [`scrapy/`](scrapy/) | a minimal spider and settings that route every request through Node4 |
 | [`browsers/`](browsers/) | Playwright (Python and Node), Puppeteer, Selenium with Chrome and Firefox, one exit IP per browser context, cutting data use on per-GB plans, and a local forwarder |
-| [`api/`](api/) | the REST API: account status, proxy list export, usage, IP whitelist management |
+| [`api/`](api/) | the REST API in Python and Node.js: status, proxy export, usage, IP whitelist, buying plans with idempotency keys, gateway proxy strings, sub-users per client, IP replacement with health checks, safe retries, and a signed webhook receiver |
 | [`checker/`](checker/) | `node4check`: checks static proxies and gateways over HTTP and SOCKS5, with rotation and sticky tests and JSON/CSV output |
 | [`tools/`](tools/) | proxy settings for environment variables, curl, wget, git, pip, npm, Docker, apt, proxychains, yt-dlp, ssh and Windows |
 | [`patterns/`](patterns/) | sizing concurrency, sticky vs rotating, retry and backoff |
@@ -92,6 +92,8 @@ More detail: [IP rotation guide](https://node4.io/help/ip-rotation-guide).
 | `NODE4_USER`, `NODE4_PASS` | everything | from your Proxies page |
 | `NODE4_GATEWAY` | rotating and residential examples | `gw-rotating_datacenter.node4.io:8083` (default) |
 | `NODE4_PROXY` | static examples | `203.0.113.10:4443` |
+| `NODE4_API_KEY` | [`api/`](api/) | `n4k_...`, from **Account Settings → API & Webhooks** |
+| `NODE4_WEBHOOK_SECRET` | [`api/`](api/) webhook receivers | the secret returned when the webhook was created |
 
 Concurrency defaults in the examples stay at or below 10 connections, the free tier's limit. On Rotating Unmetered, raise them to your plan's connection count.
 
@@ -116,7 +118,8 @@ The gateways refuse tunnels to port 22, so SSH to a normal server does not work 
 - Setup guides: [node4.io/help](https://node4.io/help)
 - Which product fits your job: [choosing the right proxy type](https://node4.io/help/choosing-the-right-proxy-type)
 - Getting `407 Proxy Authentication Required`: [fixing 407](https://node4.io/help/fixing-407-proxy-authentication-required)
-- REST API for managing proxies: [API reference](https://node4.io/help/proxy-management-api)
+- REST API for managing proxies: [API reference](https://node4.io/help/proxy-management-api), [OpenAPI document](https://node4.io/openapi.json), and the [API docs in your dashboard](https://node4.io/api-docs)
+- API guides: [getting started](https://node4.io/help/getting-started-with-the-node4-api), [buying plans and top-ups](https://node4.io/help/buying-plans-and-top-ups-with-the-api), [errors, rate limits and retries](https://node4.io/help/api-errors-rate-limits-and-retries), [gateway proxy strings](https://node4.io/help/building-proxy-strings-with-the-gateway-api), [sub-users for clients](https://node4.io/help/managing-sub-users-for-clients-with-the-api), [IP replacement and proxy health](https://node4.io/help/automating-ip-replacement-and-proxy-health), [webhooks](https://node4.io/help/receiving-node4-webhooks), [billing](https://node4.io/help/automating-billing-with-the-api)
 - Check a list of proxies or a gateway from the command line: [`checker/`](checker/)
 - Support: support@node4.io
 
