@@ -1,6 +1,6 @@
 # Manage a Node4 account from PowerShell with the REST API.
 #
-#   $env:NODE4_API_KEY = 'n4k_...'     # Settings -> API Keys on https://node4.io
+#   $env:NODE4_API_KEY = 'n4k_...'     # Account Settings -> API & Webhooks on https://node4.io
 #   .\api.ps1 status
 #   .\api.ps1 export proxies.txt       # host:port:user:pass, one per line
 #   .\api.ps1 usage
@@ -10,7 +10,8 @@
 #
 # Reference: https://node4.io/help/proxy-management-api (OpenAPI spec at https://node4.io/openapi.json).
 # Each call needs a matching permission on the key: read:proxies, read:usage, read:profile
-# (listing the whitelist) or write:ip-whitelist. The API allows 60 requests per minute per key.
+# (listing the whitelist) or write:ip-whitelist. The API allows 60 requests per minute per key,
+# and 300 per minute from one client IP across all keys.
 # The API is called directly, not through a proxy, and needs no NODE4_USER / NODE4_PASS.
 param(
     [Parameter(Position = 0)][string]$Command,
@@ -24,7 +25,7 @@ if ($PSVersionTable.PSVersion.Major -lt 6) {
 
 $base = 'https://node4.io/api/v1'
 if (-not $env:NODE4_API_KEY) {
-    [Console]::Error.WriteLine('Set NODE4_API_KEY (create one under Settings -> API Keys on node4.io).')
+    [Console]::Error.WriteLine('Set NODE4_API_KEY (create one under Account Settings -> API & Webhooks on node4.io).')
     exit 1
 }
 $headers = @{ Authorization = "Bearer $env:NODE4_API_KEY" }
@@ -36,7 +37,14 @@ function Invoke-Node4Api([string]$Method, [string]$PathAndQuery, $Body) {
         Invoke-RestMethod @params
     } catch {
         $code = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
-        if ($code -eq 429) { [Console]::Error.WriteLine('Rate limited: 60 requests per minute per key. Wait and retry.') }
+        if ($code -eq 429) {
+            $resp = $_.Exception.Response
+            $wait = try {
+                if ($resp.Headers.RetryAfter) { [int]$resp.Headers.RetryAfter.Delta.TotalSeconds }  # PowerShell 7
+                else { $resp.Headers['Retry-After'] }                                               # Windows PowerShell 5.1
+            } catch { '?' }
+            [Console]::Error.WriteLine("Rate limited (60 requests per minute per key, 300 per IP). Retry after $wait seconds.")
+        }
         else { [Console]::Error.WriteLine("$Method $PathAndQuery -> HTTP ${code}: $($_.ErrorDetails.Message)") }
         exit 1
     }
