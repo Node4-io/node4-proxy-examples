@@ -54,6 +54,7 @@ python buy_plan.py                                    # plans on sale
 python buy_plan.py --plan dc-10 --payment card        # dry run
 python buy_plan.py --plan dc-10 --payment card --yes  # buys, then polls the order
 python buy_plan.py --topup topup_50gb --yes           # top-ups are paid with Bitcoin
+python buy_plan.py --plan shared-25 --country IT_ES   # Premium and Shared plans take a country; IT_ES is Shared only
 ```
 
 Nothing is bought without `--yes`. `POST /orders` and `POST /topups` require an `Idempotency-Key` header. The script generates one per purchase and prints it **before** sending. If the run is interrupted or times out, rerun the same command with `--idempotency-key <key>`: the server replays the first answer (`Idempotent-Replayed: true`) and does not charge again. Keys are remembered for 24 hours; the same key with a different body is `422 idempotency_key_reused`.

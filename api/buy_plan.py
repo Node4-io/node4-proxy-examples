@@ -5,6 +5,7 @@
     python buy_plan.py --plan dc-10 --payment card            # dry run: shows what would be bought
     python buy_plan.py --plan dc-10 --payment card --yes      # buys (write:orders), then polls
     python buy_plan.py --topup topup_50gb --yes               # bandwidth top-up, paid with Bitcoin
+    python buy_plan.py --plan shared-25 --country IT_ES       # Shared plan split between Italy and Spain (dry run)
     python buy_plan.py --order 9301                           # poll an existing order (read:orders)
 
 Nothing is bought without --yes. Before the purchase is sent, the script prints its
@@ -62,7 +63,7 @@ def main():
     ap.add_argument("--plan", help="plan slug or id from the plan list")
     ap.add_argument("--topup", help="add-on id such as topup_50gb or ip_5 (Bitcoin only)")
     ap.add_argument("--payment", choices=("card", "bitcoin"), default="bitcoin")
-    ap.add_argument("--country", help="for plans with countrySelectable, such as US")
+    ap.add_argument("--country", help="for plans with countrySelectable: a code from the plan's countries list, such as US, IT or ES (Shared plans also offer IT_ES, an even Italy/Spain split)")
     ap.add_argument("--discount-code")
     ap.add_argument("--idempotency-key", help="resend an interrupted purchase with its original key")
     ap.add_argument("--order", type=int, help="only poll this order id")
